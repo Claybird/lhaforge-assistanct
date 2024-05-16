@@ -2,7 +2,6 @@
 
 #include "Association.h"
 
-#ifdef __LFASSIST__
 //関連付けを作成
 bool AssocSetAssociation(const ASSOCINFO& AssocInfo)
 {
@@ -182,7 +181,6 @@ bool AssocDeleteAssociation(LPCTSTR Ext)
 
 	return false;
 }
-#endif//__LFASSIST__
 
 #ifndef __UNINSTALLER__
 //関連付けを取得
@@ -305,7 +303,6 @@ bool AssocGetAssociation(ASSOCINFO &AssocInfo)
 }
 #endif //__UNINSTALLER__
 
-#ifdef __LFASSIST__
 // 再起的レジストリ削除
 bool AssocRecursiveDeleteKey(HKEY hParentKey,LPCTSTR KeyName)
 {
@@ -359,5 +356,3 @@ bool AssocRegExistKey(HKEY hParentKey,LPCTSTR KeyName)
 
 	return false;
 }
-#endif//__LFASSIST__
-

@@ -1,12 +1,6 @@
 #include "stdafx.h"
 #include "shellmanager.h"
-#ifdef __UNINSTALLER__
- #include "../uninstall/resource.h"
-#elif defined(__LFASSIST__)
- #include "../LFAssist/resource.h"
-#else
- #include "../resource.h"
-#endif
+#include "resource.h"
 
 
 

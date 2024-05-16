@@ -23,18 +23,14 @@ public:
 	virtual ~ASSOCINFO(){}
 };
 
-#ifdef __LFASSIST__
 //関連付けを作成
 bool AssocSetAssociation(const ASSOCINFO&);
 //関連付けを削除
 bool AssocDeleteAssociation(LPCTSTR Ext);
-#endif//__LFASSIST__
 //関連付けを取得
 bool AssocGetAssociation(ASSOCINFO&);
 
-#ifdef __LFASSIST__
 //レジストリ再帰的削除
 bool AssocRecursiveDeleteKey(HKEY,LPCTSTR);
 bool AssocRegExistKey(HKEY,LPCTSTR);
-#endif//__LFASSIST__
 
