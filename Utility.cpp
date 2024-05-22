@@ -25,6 +25,40 @@ bool UtilCheckINISectionExists(const std::wstring& appName, const std::filesyste
 	return dwRead>0;
 }
 
+std::wstring UtilRegQueryString(HKEY hKey, const std::wstring& path)
+{
+	HKEY hKey;
+	LONG Ret = ::RegOpenKeyExW(hKey, path.c_str(), NULL, KEY_READ, &hKey);
+	if (ERROR_SUCCESS != Ret) {
+		return L"";
+	}
+
+	std::vector<BYTE> Buffer;
+	DWORD dwRead = 0;
+	::RegQueryValueExW(hKey, NULL, NULL, NULL, NULL, &dwRead);
+	Buffer.resize(dwRead + 1, 0);
+	Ret = ::RegQueryValueExW(hKey, NULL, NULL, NULL, &Buffer.at(0), &dwRead);
+	::RegCloseKey(hKey);
+
+	if (ERROR_SUCCESS == Ret) {
+		return (const wchar_t*)&Buffer.at(0);
+	} else {
+		return L"";
+	}
+}
+
+LSTATUS UtilRegSetKeyAndValue(HKEY root, const std::wstring& keyPath, const std::wstring& name, const std::wstring& value)
+{
+	auto result = RegSetKeyValueW(root,
+		keyPath.c_str(),
+		name.c_str(),
+		REG_SZ,
+		(const BYTE*)value.c_str(),
+		(DWORD)(wcslen(value.c_str()) + 1) * sizeof(wchar_t));
+
+	return result;
+}
+
 //executable name
 std::filesystem::path UtilGetModulePath()
 {
