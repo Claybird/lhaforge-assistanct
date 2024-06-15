@@ -1,5 +1,7 @@
 #pragma once
 
+#include <simpleini.h>	//dependency/simpleini/simpleini.h
+
 std::vector<std::wstring> UtilGetCommandLineArgs();
 
 bool UtilCheckINISectionExists(const std::wstring& appName, const std::filesystem::path& file);

@@ -1,0 +1,4 @@
+[submodule "dependency/simpleini"]
+	path = dependency/simpleini
+	url = git@github.com:brofield/simpleini.git
+	branch = master
