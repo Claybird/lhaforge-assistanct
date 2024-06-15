@@ -27,7 +27,6 @@ bool UtilCheckINISectionExists(const std::wstring& appName, const std::filesyste
 
 std::wstring UtilRegQueryString(HKEY hKey, const std::wstring& path)
 {
-	HKEY hKey;
 	LONG Ret = ::RegOpenKeyExW(hKey, path.c_str(), NULL, KEY_READ, &hKey);
 	if (ERROR_SUCCESS != Ret) {
 		return L"";
@@ -79,4 +78,12 @@ std::filesystem::path UtilGetModulePath()
 std::filesystem::path UtilGetModuleDirectoryPath()
 {
 	return std::filesystem::path(UtilGetModulePath()).parent_path();
+}
+
+//loads string from resource
+std::wstring UtilLoadString(UINT uID)
+{
+	wchar_t buf[256];
+	LoadStringW(GetModuleHandleW(nullptr), uID, buf, 256);
+	return buf;
 }
