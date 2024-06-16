@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "shellmanager.h"
 #include "resource.h"
 #include "utility.h"
 
@@ -36,18 +35,16 @@ bool shellUnregisterServer(HWND hWnd, const std::filesystem::path& dllPath)
 	return callDllProcSub(hWnd, dllPath, "DllUnregisterServer");
 }
 
-void processShellExt(const std::filesystem::path& iniName)
+void processShellExt(const CSimpleIniW& ini)
 {
-	if (UtilCheckINISectionExists(L"Shell", iniName)) {
-		auto dllPath = UtilGetModuleDirectoryPath() / L"ShellExtDLL64.dll";
+	auto dllPath = UtilGetModuleDirectoryPath() / L"ShellExtDLL64.dll";
 
-		int nAction = GetPrivateProfileIntW(L"Shell", L"set", -1, iniName.c_str());
+	int nAction = ini.GetLongValue(L"Shell", L"set", -1);
 
-		if (0 == nAction) {
-			shellUnregisterServer(NULL, dllPath);
-		} else {
-			shellRegisterServer(NULL, dllPath);
-		}
+	if (0 == nAction) {
+		shellUnregisterServer(NULL, dllPath);
+	} else if (nAction > 0) {
+		shellRegisterServer(NULL, dllPath);
 	}
 }
 

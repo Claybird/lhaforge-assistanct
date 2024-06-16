@@ -108,10 +108,8 @@
     <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Association.h" />
     <ClInclude Include="LFAssist.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="shellmanager.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="utility.h" />
   </ItemGroup>

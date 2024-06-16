@@ -1,10 +1,7 @@
 #pragma once
 
-#include <simpleini.h>	//dependency/simpleini/simpleini.h
-
 std::vector<std::wstring> UtilGetCommandLineArgs();
 
-bool UtilCheckINISectionExists(const std::wstring& appName, const std::filesystem::path& file);
 std::wstring UtilRegQueryString(HKEY hKey, const std::wstring& path);
 LSTATUS UtilRegSetKeyAndValue(HKEY root, const std::wstring& keyPath, const std::wstring& name, const std::wstring& value);
 

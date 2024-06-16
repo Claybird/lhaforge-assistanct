@@ -32,16 +32,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Association.h">
-      <Filter>header files</Filter>
-    </ClInclude>
     <ClInclude Include="LFAssist.h">
       <Filter>header files</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>header files</Filter>
-    </ClInclude>
-    <ClInclude Include="shellmanager.h">
       <Filter>header files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">

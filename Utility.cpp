@@ -16,15 +16,6 @@ std::vector<std::wstring> UtilGetCommandLineArgs()
 	return args;
 }
 
-bool UtilCheckINISectionExists(const std::wstring& appName, const std::filesystem::path &file)
-{
-	auto path = std::filesystem::path(file).make_preferred();
-	const size_t bufsize = 16;
-	wchar_t szBuffer[bufsize] = {};
-	DWORD dwRead = GetPrivateProfileSectionW(appName.c_str(), szBuffer, bufsize - 1, path.c_str());
-	return dwRead>0;
-}
-
 std::wstring UtilRegQueryString(HKEY hKey, const std::wstring& path)
 {
 	LONG Ret = ::RegOpenKeyExW(hKey, path.c_str(), NULL, KEY_READ, &hKey);

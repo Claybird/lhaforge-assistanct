@@ -1,19 +1,9 @@
 #include "stdafx.h"
 #include "LFAssist.h"
-#include "ShellManager.h"
-#include "Association.h"
 #include "Utility.h"
 
-void processDeleteFile(const std::filesystem::path& iniName)
-{
-	//delete ini if it contains specific keyword
-	wchar_t szBuffer[_MAX_PATH * 2] = { 0 };
-	GetPrivateProfileStringW(L"PostProcess", L"DeleteMe", L"", szBuffer, sizeof(szBuffer) / sizeof(szBuffer[0]) - 1, iniName.c_str());
-	const std::wstring expectedPhrase = L"Please_Delete_Me";
-	if (szBuffer == expectedPhrase) {
-		::DeleteFileW(iniName.c_str());
-	}
-}
+void processShellExt(const CSimpleIniW& ini);
+void processAssoc(const CSimpleIniW& ini);
 
 int APIENTRY wWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -28,14 +18,21 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 	}
 
 	std::filesystem::path iniName = cmdArgs[1];
+	if (std::filesystem::is_regular_file(iniName)) {
+		CSimpleIniW ini;
+		ini.LoadFile(iniName.c_str());
 
-	processShellExt(iniName);
-	processAssoc(iniName);
+		processShellExt(ini);
+		processAssoc(ini);
 
-	processDeleteFile(iniName);
+		//delete ini if it contains specific keyword
+		if (L"Please_Delete_Me" == ini.GetValue(L"PostProcess", L"DeleteMe")) {
+			std::filesystem::remove(iniName);
+		}
 
-	//notify shell
-	::SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+		//notify shell
+		::SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+	}
 	return 0;
 }
 

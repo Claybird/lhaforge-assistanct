@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "Association.h"
 #include "Utility.h"
 
 const wchar_t* ASSOC_PREFIX = L"LhaForge2Archive_";
@@ -61,9 +60,8 @@ void setAssociation(const std::wstring &ext, const std::wstring& cmd, const std:
 	UtilRegSetKeyAndValue(HKEY_CLASSES_ROOT, fileType + L"\\shell\\open\\command", L"", cmd);
 }
 
-void processAssoc(const std::filesystem::path& inifile)
+void processAssoc(const CSimpleIniW& ini)
 {
-	const std::filesystem::path iniPath = std::filesystem::path(inifile).make_preferred();
 	const std::vector<wchar_t*> extArray = {
 		L".lzh",
 		L".lzs",
@@ -107,17 +105,15 @@ void processAssoc(const std::filesystem::path& inifile)
 	strCmd += L" /m \"%1\"";
 
 	for (const auto& ext : extArray) {
-		if (UtilCheckINISectionExists(ext, iniPath)) {
-			int nAction = GetPrivateProfileIntW(ext, L"set", -1, iniPath.c_str());
+		if (ini.KeyExists(ext, L"set")) {
+			int nAction = ini.GetLongValue(ext, L"set", -1);
 			if (0 == nAction) {
 				unsetAssociation(ext);
-			} else {
-				wchar_t szBuffer[_MAX_PATH * 2] = { 0 };
-				GetPrivateProfileStringW(ext, L"iconfile", L"", szBuffer, sizeof(szBuffer) / sizeof(szBuffer[0]) - 1, iniPath.c_str());
-				std::wstring iconFile = szBuffer;
-				int iconIndex = GetPrivateProfileIntW(ext, L"iconindex", 0, iniPath.c_str());
+			} else if (nAction > 0) {
+				std::wstring iconFile = ini.GetValue(ext, L"iconfile");
+				int iconIndex = ini.GetLongValue(ext, L"iconindex", 0);
 
-				setAssociation(ext, strCmd, Format(L"%s,%d", szBuffer, iconIndex));
+				setAssociation(ext, strCmd, Format(L"%s,%d", iconFile, iconIndex));
 			}
 		}
 	}
