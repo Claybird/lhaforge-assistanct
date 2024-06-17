@@ -51,11 +51,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="LFAssist.manifest.xml">
-      <Filter>resource files</Filter>
-    </Xml>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="LFAssist.rc">
       <Filter>resource files</Filter>
     </ResourceCompile>
