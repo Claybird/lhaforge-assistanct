@@ -21,7 +21,16 @@ inline std::wstring toUpper(const std::wstring& input) {
 	});
 	return output;
 }
-
+template <typename T>
+T Argument(T value) noexcept
+{
+	return value;
+}
+template <typename T>
+T const* Argument(std::basic_string<T> const& value) noexcept
+{
+	return value.c_str();
+}
 template <typename ...Args>
 std::wstring Format(const std::wstring& fmt, Args && ...args)
 {
@@ -29,9 +38,9 @@ std::wstring Format(const std::wstring& fmt, Args && ...args)
 	std::wstring work;
 #pragma warning(push)
 #pragma warning(disable:4996)
-	auto size = _snwprintf(nullptr, 0, fmt.c_str(), std::forward<Args>(args)...);
+	auto size = _snwprintf(nullptr, 0, fmt.c_str(), Argument(args)...);
 	work.resize(size + 1);
-	_snwprintf(&work[0], work.size(), fmt.c_str(), std::forward<Args>(args)...);
+	_snwprintf(&work[0], work.size(), fmt.c_str(), Argument(args)...);
 #pragma warning(pop)
 	return work.c_str();
 }
