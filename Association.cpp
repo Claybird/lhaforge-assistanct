@@ -32,7 +32,10 @@ void unsetAssociation(const std::wstring& ext)
 	RegDeleteTreeW(HKEY_CLASSES_ROOT, fileType.c_str());
 
 	if (currentAssoc.fileType == fileType) {
-		if (!currentAssoc.orgFileType.empty()) {
+		if (currentAssoc.orgFileType.empty()) {
+			UtilRegSetKeyAndValue(HKEY_CLASSES_ROOT, ext, L"", L"");
+			RegDeleteKeyW(HKEY_CLASSES_ROOT, (ext + L"\\LhaForge2OrgFileType").c_str());
+		} else {
 			auto prevCmd = UtilRegQueryString(HKEY_CLASSES_ROOT, currentAssoc.orgFileType + L"\\shell\\open\\command");
 			if (!prevCmd.empty()) {
 				//previous association is still alive
