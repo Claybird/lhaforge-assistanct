@@ -26,7 +26,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 		processAssoc(ini);
 
 		//delete ini if it contains specific keyword
-		if (L"Please_Delete_Me" == ini.GetValue(L"PostProcess", L"DeleteMe")) {
+		if (std::wstring(L"Please_Delete_Me") == ini.GetValue(L"PostProcess", L"DeleteMe")) {
 			std::filesystem::remove(iniName);
 		}
 
