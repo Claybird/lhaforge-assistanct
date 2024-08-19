@@ -63,43 +63,43 @@ void setAssociation(const std::wstring &ext, const std::wstring& cmd, const std:
 	UtilRegSetKeyAndValue(HKEY_CLASSES_ROOT, fileType + L"\\shell\\open\\command", L"", cmd);
 }
 
+static const std::vector<wchar_t*> extArray = {
+	L".lzh",
+	L".lzs",
+	L".lha",
+
+	L".zip",
+	L".cab",
+	L".zipx",
+
+	L".7z",
+
+	L".rar",
+	L".arj",
+	L".bza",
+	L".gza",
+
+	L".uue",
+
+	L".tar",
+	L".gz",
+	L".bz2",
+	L".xz",
+	L".lzma",
+	L".zst",
+	L".z",
+	L".cpio",
+	L".tgz",
+	L".tbz",
+	L".txz",
+	L".tlz",
+	L".taz",
+
+	L".iso",
+};
+
 void processAssoc(const CSimpleIniW& ini)
 {
-	const std::vector<wchar_t*> extArray = {
-		L".lzh",
-		L".lzs",
-		L".lha",
-
-		L".zip",
-		L".cab",
-		L".zipx",
-
-		L".7z",
-
-		L".rar",
-		L".arj",
-		L".bza",
-		L".gza",
-
-		L".uue",
-
-		L".tar",
-		L".gz",
-		L".bz2",
-		L".xz",
-		L".lzma",
-		L".zst",
-		L".z",
-		L".cpio",
-		L".tgz",
-		L".tbz",
-		L".txz",
-		L".tlz",
-		L".taz",
-
-		L".iso",
-	};
-
 	auto exe = UtilGetModuleDirectoryPath() / L"LhaForge.exe";
 	std::wstring strCmd = L"\"" + exe.make_preferred().wstring() + L"\"";
 	strCmd += L" /m \"%1\"";
@@ -116,5 +116,12 @@ void processAssoc(const CSimpleIniW& ini)
 				setAssociation(ext, strCmd, Format(L"%s,%d", iconFile, iconIndex));
 			}
 		}
+	}
+}
+
+void unsetAssoc()
+{
+	for (const auto& ext : extArray) {
+		unsetAssociation(ext);
 	}
 }

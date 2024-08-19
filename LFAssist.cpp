@@ -3,7 +3,10 @@
 #include "Utility.h"
 
 void processShellExt(const CSimpleIniW& ini);
+void unsetShellExt();
+
 void processAssoc(const CSimpleIniW& ini);
+void unsetAssoc();
 
 int APIENTRY wWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -17,22 +20,26 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 		return 0;	//nothing to do
 	}
 
-	std::filesystem::path iniName = cmdArgs[1];
-	if (std::filesystem::is_regular_file(iniName)) {
-		CSimpleIniW ini;
-		ini.LoadFile(iniName.c_str());
+	if (cmdArgs[1] == L"/uninstall") {
+		unsetShellExt();
+		unsetAssoc();
+	} else {
+		std::filesystem::path iniName = cmdArgs[1];
+		if (std::filesystem::is_regular_file(iniName)) {
+			CSimpleIniW ini;
+			ini.LoadFile(iniName.c_str());
 
-		processShellExt(ini);
-		processAssoc(ini);
+			processShellExt(ini);
+			processAssoc(ini);
 
-		//delete ini if it contains specific keyword
-		if (std::wstring(L"Please_Delete_Me") == ini.GetValue(L"PostProcess", L"DeleteMe")) {
-			std::filesystem::remove(iniName);
+			//delete ini if it contains specific keyword
+			if (std::wstring(L"Please_Delete_Me") == ini.GetValue(L"PostProcess", L"DeleteMe")) {
+				std::filesystem::remove(iniName);
+			}
+
+			//notify shell
+			::SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 		}
-
-		//notify shell
-		::SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 	}
 	return 0;
 }
-

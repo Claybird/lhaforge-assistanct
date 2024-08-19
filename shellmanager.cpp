@@ -48,3 +48,8 @@ void processShellExt(const CSimpleIniW& ini)
 	}
 }
 
+void unsetShellExt()
+{
+	auto dllPath = UtilGetModuleDirectoryPath() / L"ShellExtDLL64.dll";
+	shellUnregisterServer(NULL, dllPath);
+}
