@@ -77,14 +77,11 @@ void processAssoc(const CSimpleIniW& ini)
 		L".7z",
 
 		L".rar",
-		L".ace",
 		L".arj",
 		L".bza",
 		L".gza",
-		L".jak",
 
 		L".uue",
-		L".ish",
 
 		L".tar",
 		L".gz",
