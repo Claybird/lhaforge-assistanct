@@ -87,6 +87,7 @@ static const std::vector<wchar_t*> extArray = {
 	L".xz",
 	L".lzma",
 	L".zst",
+	L".lz4",
 	L".z",
 	L".cpio",
 	L".tgz",
