@@ -1,72 +1,49 @@
-//LhaForge用
-
-//デバッグ用関数および便利な関数群
 #pragma once
-//#pragma warning(disable:4786)
 
-#if defined(_DEBUG) || defined(DEBUG)
+std::vector<std::wstring> UtilGetCommandLineArgs();
 
-void TraceLastError();
+std::wstring UtilRegQueryString(HKEY hKey, const std::wstring& path);
+LSTATUS UtilRegSetKeyAndValue(HKEY root, const std::wstring& keyPath, const std::wstring& name, const std::wstring& value);
 
-#else
-// Releaseのとき
-#define TraceLastError
-
-#endif	//_DEBUG
-
-//=============================================
-// 共通便利関数
-//=============================================
-
-//エラーメッセージを表示
-int ErrorMessage(LPCTSTR);
-//メッセージキャプションを取得
-LPCTSTR UtilGetMessageCaption();
-void UtilGetLastErrorMessage(CString &strMsg);
-
-#define BOOL2bool(x)	(FALSE!=x)
-
-//コマンドライン引数を取得(個数を返す)
-int UtilGetCommandLineParams(std::vector<CString> &rParams);
-
-//INIに数字を文字列として書き込む
-BOOL UtilWritePrivateProfileInt(LPCTSTR lpAppName,LPCTSTR lpKeyName,LONG nData,LPCTSTR lpFileName);
-
-//INIに指定されたセクションがあるならtrueを返す
-bool UtilCheckINISectionExists(LPCTSTR lpAppName,LPCTSTR lpFileName);
-
-//指定されたmapがキーを持っているかどうか
 template <typename mapclass,typename keyclass>
 bool has_key(const mapclass &theMap,keyclass theKey){
 	return theMap.find(theKey)!=theMap.end();
 }
 
+std::filesystem::path UtilGetModulePath();
+std::filesystem::path UtilGetModuleDirectoryPath();
 
-enum PATHERROR{
-	PATHERROR_NONE,		//成功
-	PATHERROR_INVALID,	//パラメータ指定が不正
-	PATHERROR_ABSPATH,	//絶対パスの取得に失敗
-	PATHERROR_NOTFOUND,	//ファイルもしくはフォルダが見つからない
-	PATHERROR_LONGNAME,	//ロングファイル名取得失敗
-};
-//フルパスかつ絶対パスの取得
-PATHERROR UtilGetCompletePathName(CString &_FullPath,LPCTSTR lpszFileName);
-
-//自分のプログラムのおいてあるディレクトリのパス名を返す
-LPCTSTR UtilGetModuleDirectoryPath();
-
-//指定された値が配列中にあればそのインデックスを探す;無ければ-1
-template <typename arrayclass,typename valueclass>
-int index_of(const arrayclass &theArray,valueclass theValue){
-	for(unsigned int i=0;i<theArray.size();++i){
-		if(theArray[i]==theValue){
-			return (signed)i;
-		}
-	}
-	return -1;
+inline std::wstring toUpper(const std::wstring& input) {
+	std::wstring output;
+	std::transform(input.begin(), input.end(), std::back_inserter(output),
+		[](wchar_t c) {
+		return towupper(c);
+	});
+	return output;
 }
-//コンテナの要素を削除する
-template <typename arrayclass,typename valueclass>
-void remove_item(arrayclass &theArray,const valueclass &theValue){
-	theArray.erase(std::remove(theArray.begin(), theArray.end(), theValue), theArray.end());
+template <typename T>
+T Argument(T value) noexcept
+{
+	return value;
 }
+template <typename T>
+T const* Argument(std::basic_string<T> const& value) noexcept
+{
+	return value.c_str();
+}
+template <typename ...Args>
+std::wstring Format(const std::wstring& fmt, Args && ...args)
+{
+	//snprintf_s will not return the required buffer size
+	std::wstring work;
+#pragma warning(push)
+#pragma warning(disable:4996)
+	auto size = _snwprintf(nullptr, 0, fmt.c_str(), Argument(args)...);
+	work.resize(size + 1);
+	_snwprintf(&work[0], work.size(), fmt.c_str(), Argument(args)...);
+#pragma warning(pop)
+	return work.c_str();
+}
+
+//loads string from resource
+std::wstring UtilLoadString(UINT uID);

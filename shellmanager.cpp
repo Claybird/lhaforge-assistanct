@@ -1,80 +1,61 @@
 #include "stdafx.h"
-#include "shellmanager.h"
-#ifdef __UNINSTALLER__
- #include "../uninstall/resource.h"
-#elif defined(__LFASSIST__)
- #include "../LFAssist/resource.h"
-#else
- #include "../resource.h"
-#endif
+#include "resource.h"
+#include "utility.h"
 
-
-
-//-------------------------------------------------------------------------
-// ShellRegisterServer			拡張シェルを登録
-//-------------------------------------------------------------------------
-bool ShellRegisterServer(HWND hWnd,LPCTSTR inDllPath)
+bool callDllProcSub(HWND hWnd, const std::filesystem::path& dllPath, const std::string& procname)
 {
-	// ライブラリをロード
-	HINSTANCE theDllH = ::LoadLibrary(inDllPath);
-	if(!theDllH){
-		// ロード出来ませんでした
-		CString msg;
-		msg.Format(IDS_ERROR_DLL_LOAD,inDllPath);
-		MessageBox(hWnd,msg,CString(MAKEINTRESOURCE(IDS_MESSAGE_CAPTION)),MB_OK|MB_ICONSTOP);
+	HINSTANCE hInstance = ::LoadLibraryW(dllPath.c_str());
+	if (!hInstance) {
+		auto msg = Format(UtilLoadString(IDS_ERROR_DLL_LOAD), dllPath.c_str());
+		::MessageBoxW(hWnd, msg.c_str(), UtilLoadString(IDS_MESSAGE_CAPTION).c_str(), MB_OK | MB_ICONSTOP);
 		return false;
 	}
 
-	// エントリーポイントを探して実行
 	FARPROC lpDllEntryPoint;
-	(FARPROC&)lpDllEntryPoint = ::GetProcAddress(theDllH,"DllRegisterServer");
-	if(lpDllEntryPoint){
-		// 登録
+	(FARPROC&)lpDllEntryPoint = ::GetProcAddress(hInstance, procname.c_str());
+	if (lpDllEntryPoint) {
 		(*lpDllEntryPoint)();
-//		MessageBeep(MB_OK);
-	}else{
-		// DllRegisterServer が見つかりません
-		CString msg;
-		msg.Format(IDS_ERROR_DLL_FUNCTION_GET,inDllPath,_T("DllRegisterServer"));
-		MessageBox(hWnd,msg,CString(MAKEINTRESOURCE(IDS_MESSAGE_CAPTION)),MB_OK|MB_ICONSTOP);
-		::FreeLibrary(theDllH);
+	} else {
+		auto msg = Format(UtilLoadString(IDS_ERROR_DLL_FUNCTION_GET), dllPath.c_str(), procname.c_str());
+		::MessageBoxW(hWnd, msg.c_str(), UtilLoadString(IDS_MESSAGE_CAPTION).c_str(), MB_OK | MB_ICONSTOP);
+		::FreeLibrary(hInstance);
 		return false;
 	}
-	::FreeLibrary(theDllH);
+	::FreeLibrary(hInstance);
 	return true;
 }
 
-//-------------------------------------------------------------------------
-// ShellUnregisterServer			拡張シェルを解除
-//-------------------------------------------------------------------------
-bool ShellUnregisterServer(HWND hWnd,LPCTSTR inDllPath)
+bool shellRegisterServer(HWND hWnd, const std::filesystem::path &dllPath)
 {
-	// ライブラリをロード
-	HINSTANCE theDllH = ::LoadLibrary(inDllPath);
-	if(!theDllH){
-		// ﾛｰﾄﾞ出来ませんでした
-		CString msg;
-		msg.Format(IDS_ERROR_DLL_LOAD,inDllPath);
-		MessageBox(hWnd,msg,CString(MAKEINTRESOURCE(IDS_MESSAGE_CAPTION)),MB_OK|MB_ICONSTOP);
-		return false;
-	}
-
-	// エントリーポイントを探して実行
-	FARPROC	lpDllEntryPoint;
-	(FARPROC&)lpDllEntryPoint = ::GetProcAddress(theDllH,"DllUnregisterServer");
-	if(lpDllEntryPoint){
-		// 登録
-		(*lpDllEntryPoint)();
-//		MessageBeep(MB_OK);
-	}else{
-		// DllUnregisterServer が見つかりません
-		CString msg;
-		msg.Format(IDS_ERROR_DLL_FUNCTION_GET,inDllPath,_T("DllUnregisterServer"));
-		MessageBox(hWnd,msg,CString(MAKEINTRESOURCE(IDS_MESSAGE_CAPTION)),MB_OK|MB_ICONSTOP);
-		::FreeLibrary(theDllH);
-		return false;
-	}
-	::FreeLibrary(theDllH);
-	return true;
+	return callDllProcSub(hWnd, dllPath, "DllRegisterServer");
 }
 
+bool shellUnregisterServer(HWND hWnd, const std::filesystem::path& dllPath)
+{
+	return callDllProcSub(hWnd, dllPath, "DllUnregisterServer");
+}
+
+void processShellExt(const CSimpleIniW& ini)
+{
+	auto dllPath = UtilGetModuleDirectoryPath() / L"ShellExtDLL64.dll";
+
+	int nAction = ini.GetLongValue(L"Shell", L"set", -1);
+
+	if (0 == nAction) {
+		shellUnregisterServer(NULL, dllPath);
+	} else if (nAction > 0) {
+		shellRegisterServer(NULL, dllPath);
+	}
+}
+
+void unsetShellExt()
+{
+	auto dllPath = UtilGetModuleDirectoryPath() / L"ShellExtDLL64.dll";
+	shellUnregisterServer(NULL, dllPath);
+}
+
+void setShellExt()
+{
+	auto dllPath = UtilGetModuleDirectoryPath() / L"ShellExtDLL64.dll";
+	shellRegisterServer(NULL, dllPath);
+}
