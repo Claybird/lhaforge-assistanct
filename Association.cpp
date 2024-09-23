@@ -126,3 +126,20 @@ void unsetAssoc()
 		unsetAssociation(ext);
 	}
 }
+
+void setDefaultAssoc()
+{
+	auto exe = UtilGetModuleDirectoryPath() / L"LhaForge.exe";
+	std::wstring strCmd = L"\"" + exe.make_preferred().wstring() + L"\"";
+	strCmd += L" /m \"%1\"";
+
+	for (const std::wstring ext : extArray) {
+		if (L".iso" != ext) {
+			std::filesystem::path iconFile = UtilGetModuleDirectoryPath() / (L"icons/archive" + ext + L".ico");
+			int iconIndex = 0;
+
+			setAssociation(ext, strCmd, Format(L"%s,%d", iconFile.make_preferred().wstring(), iconIndex));
+		}
+	}
+}
+

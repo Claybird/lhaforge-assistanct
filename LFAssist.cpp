@@ -4,9 +4,11 @@
 
 void processShellExt(const CSimpleIniW& ini);
 void unsetShellExt();
+void setShellExt();
 
 void processAssoc(const CSimpleIniW& ini);
 void unsetAssoc();
+void setDefaultAssoc();
 
 int APIENTRY wWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -23,6 +25,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 	if (cmdArgs[1] == L"/uninstall") {
 		unsetShellExt();
 		unsetAssoc();
+	}else if (cmdArgs[1] == L"/install") {
+		setShellExt();
+		setDefaultAssoc();
 	} else {
 		std::filesystem::path iniName = cmdArgs[1];
 		if (std::filesystem::is_regular_file(iniName)) {
